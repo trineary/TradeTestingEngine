@@ -20,7 +20,6 @@ import random
 # Import my classes
 
 
-
 # --------------------------------------------------------------------------------------------------------------------
 # Class
 # --------------------------------------------------------------------------------------------------------------------
@@ -136,5 +135,5 @@ if __name__ == "__main__":
     # Functions to run if this file is executed
     print "Run default function for ", __file__
 
-    testRandomWalk()
-    #testDriftingRandomWalk()
+    #testRandomWalk()
+    testDriftingRandomWalk()

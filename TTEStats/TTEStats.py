@@ -22,12 +22,12 @@
 
 # Import my classes
 
-
 # Global values for selecting different options
-
+from RandomWalk import RandomWalk
 
 class TTEStats:
 
+    rw = None
 
     def __init__(self):
 
@@ -38,7 +38,7 @@ class TTEStats:
 # --------------------------------------------------------------------------------------------------------------------
 # Test functions
 
-import TSPlottingTools as ts
+from PyTTE import TSPlottingTools as ts
 
 def testRandomWalk():
     data = [xrange(0,20,1)]

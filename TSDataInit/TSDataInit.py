@@ -18,6 +18,7 @@
 from yahoo_finance import Share
 import pandas.io.data as web
 import pandas as pd
+import numpy as np
 import matplotlib
 
 # Import my classes
@@ -57,17 +58,73 @@ class TSBootstrapInit:
 
         return
 
-    def GetStationaryBootstrap(self):
-        # Get a stationary bootstrap of of the loaded data set.  A pandas array is returned
-        return
+    def GetStartIndex(self, ticker):
+        # Start index is uniform discrete on {1, .... N}
+        # random_integers returns a uniform distribution
+        N = len(self.adjClose[ticker])
+
+        start = np.random.random_integers(0, N)
+
+        return start
+
+    def GetRandomBlockLen(self, ticker):
+        # Length should be a geometric distribution
+        dataLen = len(self.adjClose[ticker])
+        meanBlockLen = dataLen/20.0
+        p = 1/meanBlockLen
+
+        blockLen = (np.random.geometric(p, 1)) % (dataLen-1)
+
+        return blockLen
+
+    def GetBlock(self, ticker, startIndex, blockLength):
+        # Get the pandas block for the ticker at the start index for the specified block length
+        dataLen = len(self.adjClose[ticker])
+        # Make sure indexes are integers
+        startIndex = int(startIndex)
+        blockLength = int(blockLength)
+
+        if startIndex + blockLength < dataLen:
+            block = self.adjClose[ticker].iloc[startIndex:(startIndex+blockLength)]
+        else:
+            block1 = self.adjClose[ticker].iloc[startIndex:dataLen-1]
+            block2 = self.adjClose[ticker].iloc[0:(blockLength - (dataLen-startIndex))]
+            frames = [block1, block2]
+            block = pd.concat(frames)
+
+        return block
+
+    def GetStationaryBootstrap(self, ticker):
+        # Get a stationary bootstrap of of the loaded data set.  A pandas array is returned.
+        dataLen = len(self.adjClose[ticker])
+        bootStrapLen = 0
+        stationaryBootStrap = None
+
+        while bootStrapLen < dataLen:
+            startIndex = self.GetStartIndex(ticker)
+            blockLen = self.GetRandomBlockLen(ticker)
+            newBlock = self.GetBlock(ticker, startIndex, blockLen)
+            if stationaryBootStrap is None:
+                stationaryBootStrap = newBlock
+                print "Create new block"
+            else:
+                #print "concatonate block. blocklen: ", blockLen, startIndex, startIndex+blockLen
+                frames = [stationaryBootStrap, newBlock]
+                stationaryBootStrap = pd.concat(frames)
+
+
+            bootStrapLen = len(stationaryBootStrap)
+            #print "Bootstrap len: ", bootStrapLen
+
+        return stationaryBootStrap
 
     def GetOriginalCloseData(self, ticker):
-
+        # Get the original adjusted close data
         return self.adjClose[ticker]
 
-    def PrintDataColumns(self):
-        # If it's unclear as to what columns are in the pandas data, this can be called to print them.
-        return
+    #def PrintDataColumns(self):
+    #    # If it's unclear as to what columns are in the pandas data, this can be called to print them.
+    #    return
 
 # --------------------------------------------------------------------------------------------------------------------
 # Test functions
@@ -78,10 +135,32 @@ def testyahoo():
 
     bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
     data = bs.GetOriginalCloseData("GLD")
+    for index in xrange(0,50):
+        startIndex = bs.GetStartIndex("GLD")
+        blockLen = bs.GetRandomBlockLen("GLD")
+        print startIndex, blockLen
+
+    block = bs.GetBlock("GLD", startIndex, blockLen)
+
+    print block
+    print data
+
     #plt.plot(data)
     #plt.show()
 
+    return
 
+def TestBootstrap():
+
+    bs = TSBootstrapInit()
+
+    bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
+    data = bs.GetOriginalCloseData("GLD")
+
+    bootStrap = bs.GetStationaryBootstrap("GLD")
+
+    print bootStrap
+    tsplot.GenPlot([bootStrap['GLD'].tolist()])
 
     return
 
@@ -92,4 +171,5 @@ if __name__ == "__main__":
     # Functions to run if this file is executed
     print "Run default function for ", __file__
 
-    testyahoo()
+    #testyahoo()
+    TestBootstrap()

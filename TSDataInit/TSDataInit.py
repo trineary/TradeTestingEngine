@@ -94,6 +94,31 @@ class TSBootstrapInit:
 
         return block
 
+    def ShiftBlock(self, ticker, existingBlock, newBlock):
+        # shift newBlock up or down to be close to end of existing block
+        # Get the length of the existing block and the last value in that block
+        lenExisting = len(existingBlock[ticker])
+        lastValue = existingBlock.iat[(lenExisting-1), 0]
+        lenNewBlock = len(newBlock)
+        returnBlock = newBlock
+
+        # Get the first value of the newBlock
+        firstValue = newBlock.iat[0, 0]
+        diff = (firstValue - lastValue)
+        diff = diff + diff*0.001
+
+        # Shift the newBlock so that it's closer to end of existing block
+        for index in xrange(0, lenNewBlock):
+            tempVal = returnBlock.iat[index, 0]
+            tempVal -= diff
+            returnBlock.iloc[index, 0] = tempVal
+
+        print "diff: ", diff
+
+        print returnBlock
+
+        return returnBlock
+
     def GetStationaryBootstrap(self, ticker):
         # Get a stationary bootstrap of of the loaded data set.  A pandas array is returned.
         dataLen = len(self.adjClose[ticker])
@@ -109,9 +134,10 @@ class TSBootstrapInit:
                 print "Create new block"
             else:
                 #print "concatonate block. blocklen: ", blockLen, startIndex, startIndex+blockLen
+                self.ShiftBlock(ticker, stationaryBootStrap, newBlock)
                 frames = [stationaryBootStrap, newBlock]
                 stationaryBootStrap = pd.concat(frames)
-
+                break
 
             bootStrapLen = len(stationaryBootStrap)
             #print "Bootstrap len: ", bootStrapLen

@@ -19,6 +19,7 @@ from yahoo_finance import Share
 import pandas.io.data as web
 import pandas as pd
 import numpy as np
+import random
 import matplotlib
 
 # Import my classes
@@ -29,6 +30,8 @@ class TSBootstrapInit:
 
     tickerData = {}
     adjClose = {}
+    writeBlocksToFile = True
+    blockFileName = "BlockOutput.csv"
 
     def __init__(self):
 
@@ -91,6 +94,7 @@ class TSBootstrapInit:
             block2 = self.adjClose[ticker].iloc[0:(blockLength - (dataLen-startIndex))]
             frames = [block1, block2]
             block = pd.concat(frames)
+            print "block wrapped around"
 
         return block
 
@@ -99,23 +103,20 @@ class TSBootstrapInit:
         # Get the length of the existing block and the last value in that block
         lenExisting = len(existingBlock[ticker])
         lastValue = existingBlock.iat[(lenExisting-1), 0]
-        lenNewBlock = len(newBlock)
+        lenNewBlock = len(newBlock[ticker])
         returnBlock = newBlock
 
         # Get the first value of the newBlock
         firstValue = newBlock.iat[0, 0]
         diff = (firstValue - lastValue)
-        diff = diff + diff*0.001
+        diff = diff + diff*0.01
+        print diff
 
         # Shift the newBlock so that it's closer to end of existing block
         for index in xrange(0, lenNewBlock):
             tempVal = returnBlock.iat[index, 0]
             tempVal -= diff
-            returnBlock.iloc[index, 0] = tempVal
-
-        print "diff: ", diff
-
-        print returnBlock
+            returnBlock.iat[index, returnBlock.columns.get_loc(ticker)] = tempVal
 
         return returnBlock
 
@@ -129,24 +130,34 @@ class TSBootstrapInit:
             startIndex = self.GetStartIndex(ticker)
             blockLen = self.GetRandomBlockLen(ticker)
             newBlock = self.GetBlock(ticker, startIndex, blockLen)
+
             if stationaryBootStrap is None:
                 stationaryBootStrap = newBlock
+                self.WriteBlockToFile(newBlock)
                 print "Create new block"
             else:
                 #print "concatonate block. blocklen: ", blockLen, startIndex, startIndex+blockLen
-                self.ShiftBlock(ticker, stationaryBootStrap, newBlock)
-                frames = [stationaryBootStrap, newBlock]
+                shiftedBlock = newBlock
+                shiftedBlock = self.ShiftBlock(ticker, stationaryBootStrap, newBlock)
+                frames = [stationaryBootStrap, shiftedBlock]
                 stationaryBootStrap = pd.concat(frames)
-                break
+                self.WriteBlockToFile(shiftedBlock)
 
             bootStrapLen = len(stationaryBootStrap)
-            #print "Bootstrap len: ", bootStrapLen
+            print "Bootstrap len: ", bootStrapLen
 
         return stationaryBootStrap
 
     def GetOriginalCloseData(self, ticker):
         # Get the original adjusted close data
         return self.adjClose[ticker]
+
+    def WriteBlockToFile(self, block):
+        # If flag is set to true then write block to file.
+        if self.writeBlocksToFile is True:
+            block.to_csv(self.blockFileName, mode='a')
+
+        return
 
     #def PrintDataColumns(self):
     #    # If it's unclear as to what columns are in the pandas data, this can be called to print them.
@@ -178,6 +189,7 @@ def testyahoo():
 
 def TestBootstrap():
 
+    np.random.seed(10)
     bs = TSBootstrapInit()
 
     bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
@@ -185,7 +197,6 @@ def TestBootstrap():
 
     bootStrap = bs.GetStationaryBootstrap("GLD")
 
-    print bootStrap
     tsplot.GenPlot([bootStrap['GLD'].tolist()])
 
     return

@@ -19,7 +19,7 @@ from yahoo_finance import Share
 import pandas.io.data as web
 import pandas as pd
 import numpy as np
-import random
+import csv
 import matplotlib
 
 # Import my classes
@@ -101,22 +101,22 @@ class TSBootstrapInit:
     def ShiftBlock(self, ticker, existingBlock, newBlock):
         # shift newBlock up or down to be close to end of existing block
         # Get the length of the existing block and the last value in that block
-        lenExisting = len(existingBlock[ticker])
-        lastValue = existingBlock.iat[(lenExisting-1), 0]
-        lenNewBlock = len(newBlock[ticker])
+        lastIndex = len(existingBlock)-1
+        lastValue = existingBlock[lastIndex]
+        lenNewBlock = len(newBlock)
         returnBlock = newBlock
 
         # Get the first value of the newBlock
-        firstValue = newBlock.iat[0, 0]
+        firstValue = newBlock[0]
         diff = (firstValue - lastValue)
         diff = diff + diff*0.01
         print diff
 
         # Shift the newBlock so that it's closer to end of existing block
         for index in xrange(0, lenNewBlock):
-            tempVal = returnBlock.iat[index, 0]
-            tempVal -= diff
-            returnBlock.iat[index, returnBlock.columns.get_loc(ticker)] = tempVal
+            returnBlock[index] = newBlock[index] - diff
+            #returnBlock.iat[index, returnBlock.columns.get_loc(ticker)] = tempVal
+            #returnBlock[index] = tempVal
 
         return returnBlock
 
@@ -130,6 +130,8 @@ class TSBootstrapInit:
             startIndex = self.GetStartIndex(ticker)
             blockLen = self.GetRandomBlockLen(ticker)
             newBlock = self.GetBlock(ticker, startIndex, blockLen)
+            newBlock = newBlock[ticker].tolist()
+            #print newBlock
 
             if stationaryBootStrap is None:
                 stationaryBootStrap = newBlock
@@ -139,8 +141,10 @@ class TSBootstrapInit:
                 #print "concatonate block. blocklen: ", blockLen, startIndex, startIndex+blockLen
                 shiftedBlock = newBlock
                 shiftedBlock = self.ShiftBlock(ticker, stationaryBootStrap, newBlock)
-                frames = [stationaryBootStrap, shiftedBlock]
-                stationaryBootStrap = pd.concat(frames)
+                #frames = [stationaryBootStrap, shiftedBlock]
+                #stationaryBootStrap = pd.concat(frames)
+                #stationaryBootStrap.append(shiftedBlock)
+                stationaryBootStrap = stationaryBootStrap + shiftedBlock
                 self.WriteBlockToFile(shiftedBlock)
 
             bootStrapLen = len(stationaryBootStrap)
@@ -155,7 +159,9 @@ class TSBootstrapInit:
     def WriteBlockToFile(self, block):
         # If flag is set to true then write block to file.
         if self.writeBlocksToFile is True:
-            block.to_csv(self.blockFileName, mode='a')
+            myfile = open(self.blockFileName, 'a')
+            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+            wr.writerow(block)
 
         return
 
@@ -197,8 +203,9 @@ def TestBootstrap():
 
     bootStrap = bs.GetStationaryBootstrap("GLD")
 
-    tsplot.GenPlot([bootStrap['GLD'].tolist()])
-
+    #tsplot.GenPlot([bootStrap['GLD'].tolist()])
+    tsplot.GenPlot([bootStrap])
+    print bootStrap
     return
 
 # --------------------------------------------------------------------------------------------------------------------

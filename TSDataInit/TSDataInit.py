@@ -15,12 +15,10 @@
 # --------------------------------------------------------------------------------------------------------------------
 
 # Import standard packages
-from yahoo_finance import Share
 import pandas.io.data as web
 import pandas as pd
 import numpy as np
 import csv
-import matplotlib
 
 # Import my classes
 from PyTTE import TSPlottingTools as tsplot
@@ -110,13 +108,10 @@ class TSBootstrapInit:
         firstValue = newBlock[0]
         diff = (firstValue - lastValue)
         diff = diff + diff*0.01
-        print diff
 
         # Shift the newBlock so that it's closer to end of existing block
         for index in xrange(0, lenNewBlock):
             returnBlock[index] = newBlock[index] - diff
-            #returnBlock.iat[index, returnBlock.columns.get_loc(ticker)] = tempVal
-            #returnBlock[index] = tempVal
 
         return returnBlock
 
@@ -131,24 +126,18 @@ class TSBootstrapInit:
             blockLen = self.GetRandomBlockLen(ticker)
             newBlock = self.GetBlock(ticker, startIndex, blockLen)
             newBlock = newBlock[ticker].tolist()
-            #print newBlock
 
             if stationaryBootStrap is None:
                 stationaryBootStrap = newBlock
                 self.WriteBlockToFile(newBlock)
                 print "Create new block"
             else:
-                #print "concatonate block. blocklen: ", blockLen, startIndex, startIndex+blockLen
                 shiftedBlock = newBlock
-                shiftedBlock = self.ShiftBlock(ticker, stationaryBootStrap, newBlock)
-                #frames = [stationaryBootStrap, shiftedBlock]
-                #stationaryBootStrap = pd.concat(frames)
-                #stationaryBootStrap.append(shiftedBlock)
+                #shiftedBlock = self.ShiftBlock(ticker, stationaryBootStrap, newBlock)
                 stationaryBootStrap = stationaryBootStrap + shiftedBlock
                 self.WriteBlockToFile(shiftedBlock)
 
             bootStrapLen = len(stationaryBootStrap)
-            print "Bootstrap len: ", bootStrapLen
 
         return stationaryBootStrap
 
@@ -188,9 +177,6 @@ def testyahoo():
     print block
     print data
 
-    #plt.plot(data)
-    #plt.show()
-
     return
 
 def TestBootstrap():
@@ -203,7 +189,6 @@ def TestBootstrap():
 
     bootStrap = bs.GetStationaryBootstrap("GLD")
 
-    #tsplot.GenPlot([bootStrap['GLD'].tolist()])
     tsplot.GenPlot([bootStrap])
     print bootStrap
     return

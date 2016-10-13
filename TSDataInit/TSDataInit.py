@@ -91,12 +91,12 @@ class TSBootstrapInit:
         blockLength = int(blockLength)
 
         if startIndex + blockLength < dataLen:
-            block = self.adjClose[ticker].iloc[startIndex:(startIndex+blockLength)]
+            block1 = self.adjClose[ticker].iloc[startIndex:(startIndex+blockLength)]
+            block = [block1]
         else:
             block1 = self.adjClose[ticker].iloc[startIndex:dataLen-1]
             block2 = self.adjClose[ticker].iloc[0:(blockLength - (dataLen-startIndex))]
-            frames = [block1, block2]
-            block = pd.concat(frames)
+            block = [block1, block2]
             print "block wrapped around"
 
         return block
@@ -134,16 +134,18 @@ class TSBootstrapInit:
         while bootStrapLen < dataLen:
             startIndex = self.GetStartIndex(ticker)
             blockLen = self.GetRandomBlockLen(ticker)
-            newBlock = self.GetBlock(ticker, startIndex, blockLen)
-            newBlock = newBlock[ticker].tolist()
+            newBlocks = self.GetBlock(ticker, startIndex, blockLen)
 
-            if stationaryBootStrap is None:
-                stationaryBootStrap = newBlock
-                self.WriteBlockToFile(newBlock)
-            else:
-                shiftedBlock = self.ShiftBlock( stationaryBootStrap, newBlock)
-                stationaryBootStrap = stationaryBootStrap + shiftedBlock
-                self.WriteBlockToFile(shiftedBlock)
+            for block in newBlocks:
+                newBlock = block[ticker].tolist()
+
+                if stationaryBootStrap is None:
+                    stationaryBootStrap = newBlock
+                    self.WriteBlockToFile(newBlock)
+                else:
+                    shiftedBlock = self.ShiftBlock( stationaryBootStrap, newBlock)
+                    stationaryBootStrap = stationaryBootStrap + shiftedBlock
+                    self.WriteBlockToFile(shiftedBlock)
 
             bootStrapLen = len(stationaryBootStrap)
 
@@ -186,15 +188,17 @@ class TSBootstrapInit:
         while bootStrapLen < dataLen:
             startIndex = self.GetStartIndex(ticker)
             blockLen = self.GetRandomBlockLen(ticker)
-            newBlock = self.GetBlock(ticker, startIndex, blockLen)
-            newBlock = newBlock[ticker].tolist()
+            newBlocks = self.GetBlock(ticker, startIndex, blockLen)
 
-            # Seed the first value in our new time series
-            if lastBootstrapValue is None:
-                lastBootstrapValue = newBlock[0]
-                stationaryBootStrap = [lastBootstrapValue]
-            else:
-                self.GenerateSeriesFromBlock(stationaryBootStrap, newBlock)
+            for block in newBlocks:
+                newBlock = block[ticker].tolist()
+
+                # Seed the first value in our new time series
+                if lastBootstrapValue is None:
+                    lastBootstrapValue = newBlock[0]
+                    stationaryBootStrap = [lastBootstrapValue]
+                else:
+                    self.GenerateSeriesFromBlock(stationaryBootStrap, newBlock)
 
             bootStrapLen = len(stationaryBootStrap)
 
@@ -240,7 +244,7 @@ def testyahoo():
 
 def TestBootstrapByBlock():
     # Test code that grabs a block from data set and shifts it to fit into current time series
-    np.random.seed(10)
+    np.random.seed(2)
     bs = TSBootstrapInit()
 
     bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
@@ -263,11 +267,12 @@ def TestGetNextBootstrapValue():
 def TestStationaryBootstrap():
     # Test the stationary bootstrap that generates time series by looking at percent change in random blocks
     # from original series.
-    np.random.seed(10)
+    np.random.seed(1)
     bs = TSBootstrapInit()
 
-    bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
-    bootStrap = bs.GetStationaryBootstrap("GLD")
+    #bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
+    bs.LoadFromYahooFinance(["SPY"], '2012-01-01', '2014-01-01')
+    bootStrap = bs.GetStationaryBootstrap("SPY")
 
     tsplot.GenPlot([bootStrap])
 

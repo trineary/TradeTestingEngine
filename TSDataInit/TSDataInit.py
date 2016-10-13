@@ -77,6 +77,10 @@ class TSBootstrapInit:
 
         blockLen = (np.random.geometric(p, 1)) % (dataLen-1)
 
+        # Block length <2 doesn't do us any good.  If this happens then set to 2
+        if blockLen < 2:
+            blockLen = 2
+
         return blockLen
 
     def GetBlock(self, ticker, startIndex, blockLength):
@@ -149,49 +153,44 @@ class TSBootstrapInit:
     #
     #----------------------------------------------------------------------------------------------------------------
 
-    def ShiftBlock1(self, ticker, existingBlock, newBlock):
-        # shift newBlock up or down to be close to end of existing block
-        # Get the length of the existing block and the last value in that block
-        # Shift according to return: r = log(p+1) - log(p) where p is price at time t and p+1 is price at time t+1
-        lastIndex = len(existingBlock)-1
-        lastValue = existingBlock[lastIndex]
-        lenNewBlock = len(newBlock)
-        returnBlock = newBlock
-
-        # Get the first value of the newBlock
-        firstValue = newBlock[0]
-        diff = (firstValue - lastValue)
-        diff = diff + diff*0.01
-
-        # Shift the newBlock so that it's closer to end of existing block
-        for index in xrange(0, lenNewBlock):
-            returnBlock[index] = newBlock[index] - diff
-
-        return returnBlock
-
     def GetPriceByPercentReturn(self, lastBootstrapPrice, price, nextPrice):
         # lastPrice - last price in the bootstrap list
         # price - older price in the time series
-        # nextPrice - next price in the time seris
+        # nextPrice - next price in the time series
 
         percentReturn = math.log(nextPrice) - math.log(price)
         nextBootStrapValue = lastBootstrapPrice + lastBootstrapPrice*percentReturn
         return nextBootStrapValue
 
+    def GenerateSeriesFromBlock(self, stationaryBootstrap, nextBlock):
+        # Generate a new sequence of prices to be added to the stationaryBootstrap from nextBlock
+
+        for i in range(0, (len(nextBlock)-1)):
+            newValue = self.GetPriceByPercentReturn(stationaryBootstrap[len(stationaryBootstrap)-1], nextBlock[i], nextBlock[i+1])
+            stationaryBootstrap.append(newValue)
+
+        return stationaryBootstrap
 
 
+    def GetStationaryBootstrap(self, ticker):
+        # Get a stationary bootstrap of of the loaded data set.  A list of floats is returned.
+        # This constructs a time series that grows out of the first price received from GetBlock.  All other
+        # prices are generated based on a percent return from consecutive prices.
 
-    def GetBootstrapByBlock(self, ticker):
-        # Get a stationary bootstrap of of the loaded data set.  A pandas array is returned.
         dataLen = len(self.adjClose[ticker])
         bootStrapLen = 0
         stationaryBootStrap = None
+        lastBootstrapValue = None
 
         while bootStrapLen < dataLen:
             startIndex = self.GetStartIndex(ticker)
             blockLen = self.GetRandomBlockLen(ticker)
             newBlock = self.GetBlock(ticker, startIndex, blockLen)
             newBlock = newBlock[ticker].tolist()
+
+            # Seed the first value in our new time series
+            if lastBootstrapValue is None:
+                lastBootstrapValue = newBlock[0]
 
             if stationaryBootStrap is None:
                 stationaryBootStrap = newBlock
@@ -228,7 +227,7 @@ class TSBootstrapInit:
 # Test functions
 
 def testyahoo():
-
+    # Test ability to connect to yahoo and get data from it.
     bs = TSBootstrapInit()
 
     bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
@@ -245,6 +244,18 @@ def testyahoo():
 
     return
 
+def TestBootstrapByBlock():
+    # Test code that grabs a block from data set and shifts it to fit into current time series
+    np.random.seed(10)
+    bs = TSBootstrapInit()
+
+    bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
+    bootStrap = bs.GetBootstrapByShiftedBlocks("GLD")
+
+    tsplot.GenPlot([bootStrap])
+
+    return
+
 def TestGetNextBootstrapValue():
 
     np.random.seed(10)
@@ -255,20 +266,18 @@ def TestGetNextBootstrapValue():
 
     return
 
-def TestBootstrapByBlock():
-
+def TestStationaryBootstrap():
+    # Test the stationary bootstrap that generates time series by looking at percent change in random blocks
+    # from original series.
     np.random.seed(10)
     bs = TSBootstrapInit()
 
     bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
-    data = bs.GetOriginalCloseData("GLD")
-
-    bootStrap = bs.GetBootstrapByShiftedBlocks("GLD")
+    bootStrap = bs.GetStationaryBootstrap("GLD")
 
     tsplot.GenPlot([bootStrap])
 
     return
-
 # --------------------------------------------------------------------------------------------------------------------
 # Default function when the file is run
 
@@ -277,5 +286,6 @@ if __name__ == "__main__":
     print "Run default function for ", __file__
 
     #testyahoo()
-    TestBootstrapByBlock()
+    #TestBootstrapByBlock()
     #TestGetNextBootstrapValue()
+    TestStationaryBootstrap()

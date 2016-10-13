@@ -150,7 +150,8 @@ class TSBootstrapInit:
         return stationaryBootStrap
 
     #----------------------------------------------------------------------------------------------------------------
-    #
+    #  Bootstrap approach using percent change between consecutive returns.  Time series is generated based on
+    #  the percent changes.
     #----------------------------------------------------------------------------------------------------------------
 
     def GetPriceByPercentReturn(self, lastBootstrapPrice, price, nextPrice):
@@ -191,16 +192,9 @@ class TSBootstrapInit:
             # Seed the first value in our new time series
             if lastBootstrapValue is None:
                 lastBootstrapValue = newBlock[0]
-
-            if stationaryBootStrap is None:
-                stationaryBootStrap = newBlock
-                self.WriteBlockToFile(newBlock)
-                print "Create new block"
+                stationaryBootStrap = [lastBootstrapValue]
             else:
-                shiftedBlock = newBlock
-                shiftedBlock = self.ShiftBlock( stationaryBootStrap, newBlock)
-                stationaryBootStrap = stationaryBootStrap + shiftedBlock
-                self.WriteBlockToFile(shiftedBlock)
+                self.GenerateSeriesFromBlock(stationaryBootStrap, newBlock)
 
             bootStrapLen = len(stationaryBootStrap)
 
@@ -286,6 +280,6 @@ if __name__ == "__main__":
     print "Run default function for ", __file__
 
     #testyahoo()
-    #TestBootstrapByBlock()
     #TestGetNextBootstrapValue()
-    TestStationaryBootstrap()
+    TestBootstrapByBlock()
+    #TestStationaryBootstrap()

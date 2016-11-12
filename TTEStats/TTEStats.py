@@ -38,7 +38,7 @@ class TTEStats:
 # --------------------------------------------------------------------------------------------------------------------
 # Test functions
 
-from PyTTE import TSPlottingTools as ts
+from pytte import TSPlottingTools as ts
 
 def testRandomWalk():
     data = [xrange(0,20,1)]

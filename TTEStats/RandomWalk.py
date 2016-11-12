@@ -3,7 +3,7 @@
 # Patrick Neary
 # Date: 9/22/2016
 #
-# Fin 5350
+# Fin 5350 / Dr. Tyler J. Brough
 # Trade Testing Engine:
 #
 # RandomWalk.py
@@ -110,7 +110,7 @@ class RandomWalk:
 # Test functions
 # --------------------------------------------------------------------------------------------------------------------
 
-from PyTTE import TSPlottingTools as ts
+from pytte import TSPlottingTools as ts
 
 def testRandomWalk():
     rw = RandomWalk()

@@ -3,7 +3,7 @@
 # Patrick Neary
 # Date: 9/22/2016
 #
-# Fin 5350
+# Fin 5350 / Dr. Tyler J. Brough
 # Trade Testing Engine:
 #
 # StockHistory.py
@@ -23,7 +23,6 @@ import pandas
 
 class StockHistory:
 
-
     def __init__(self):
 
         return
@@ -39,7 +38,7 @@ class StockHistory:
 # --------------------------------------------------------------------------------------------------------------------
 # Test functions
 
-from PyTTE import TSPlottingTools as ts
+from pytte import TSPlottingTools as ts
 
 def testGetStockData(equity, startDate, endDate):
     # equity - String for the ticker symbol. Example: 'SPY'

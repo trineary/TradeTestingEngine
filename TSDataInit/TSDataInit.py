@@ -22,7 +22,7 @@ import csv
 import math
 
 # Import my classes
-from PyTTE import TSPlottingTools as tsplot
+from pytte import TSPlottingTools as tsplot
 
 
 class TSBootstrapInit:
@@ -267,11 +267,11 @@ def TestGetNextBootstrapValue():
 def TestStationaryBootstrap():
     # Test the stationary bootstrap that generates time series by looking at percent change in random blocks
     # from original series.
-    np.random.seed(1)
+    #np.random.seed(1)
     bs = TSBootstrapInit()
 
     #bs.LoadFromYahooFinance(["GLD"], '2014-01-01', '2016-01-01')
-    bs.LoadFromYahooFinance(["SPY"], '2012-01-01', '2014-01-01')
+    bs.LoadFromYahooFinance(["SPY"], '2010-01-01', '2014-01-01')
     bootStrap = bs.GetStationaryBootstrap("SPY")
 
     tsplot.GenPlot([bootStrap])
@@ -286,5 +286,5 @@ if __name__ == "__main__":
 
     #testyahoo()
     #TestGetNextBootstrapValue()
-    TestBootstrapByBlock()
-    #TestStationaryBootstrap()
+    #TestBootstrapByBlock()
+    TestStationaryBootstrap()

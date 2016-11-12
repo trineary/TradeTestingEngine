@@ -1,4 +1,4 @@
 
 
-from TTE import TTE
+from pytte import tte
 

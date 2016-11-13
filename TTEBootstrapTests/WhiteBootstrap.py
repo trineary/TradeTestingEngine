@@ -16,7 +16,8 @@
 
 # Import standard packages
 import random
-from matplotlib import pyplot
+import numpy as np
+from matplotlib import pyplot as plt
 import pandas
 
 # Import my classes
@@ -49,6 +50,8 @@ class WhiteBootstrap(BootstrapABC):
         self._detrended_data = None
         self._col_name = col_name
         self._num_iterations = num_iterations
+        self._sample_means = []
+
 
         datalen = len(self._df.index)
         print "datalen: ", datalen
@@ -66,20 +69,46 @@ class WhiteBootstrap(BootstrapABC):
         print "After adjustement:", dailyreturns
 
         # Iterate over the daily returns and build a distribution of returns
-
+        meanList = []
         for meanCount in xrange(0, self._num_iterations):
             sampleSum = 0
             for randomReturn in xrange(0, datalen):
                 index = random.randint(0, datalen-1)
                 sampleSum += dailyreturns.iat[index, 0]
             sampleMean = sampleSum / datalen
-            print "Samplemean:", sampleMean
-            break
+            meanList.append(sampleMean)
+
+        print "Samplemean:", sampleMean
+        print meanList
+        print max(meanList)
+        print min(meanList)
+
+        histogram, edges = np.histogram(meanList, bins=10)
+        print histogram
+        print "lengths:", len(histogram), len(edges)
+
+        self.plot_histogram(meanList, 20)
+        self._sample_means = meanList
 
         pass
 
-    def has_predictive_power(self):
-        pass
+    def plot_histogram(self, dataList, bins):
+        plt.hist(dataList, bins=bins)
+        plt.grid(True)
+        plt.show()
+        return
+
+    def has_predictive_power(self, percentage):
+
+        lessThanCnt = 0
+        for meanReturn in self._sample_means:
+            if meanReturn < percentage:
+                lessThanCnt += 1
+
+        percentage = lessThanCnt/float(len(self._sample_means))
+        pval = 1-percentage
+
+        return pval
 
 # --------------------------------------------------------------------------------------------------------------------
 # Test functions

@@ -35,15 +35,12 @@ def GetDailyReturns(df, colName):
     prev = None
     returns = []
     for index, rowVal in df[colName].iteritems():
-        print rowVal
         if(prev == None):
             dreturn = 0.0
         else:
             dreturn = math.log10(float(rowVal)/prev)
         prev = float(rowVal)
         returns.append(dreturn)
-
-    print len(df.index), len(returns)
 
     return pandas.DataFrame(data=returns)
 
@@ -60,9 +57,34 @@ def GetMeanDailyReturn(df, colName):
 
     dailyReturns = GetDailyReturns(df, colName)
     meanDailyReturn = dailyReturns[0].mean()
-    print "meanDailyreturn: ", meanDailyReturn
 
     return meanDailyReturn, dailyReturns
 
 
+def GetDetrendedReturns(df, col_name):
 
+    # Get the daily returns and the mean daily return
+    meanDailyReturn, dailyreturns = GetMeanDailyReturn(df, col_name)
+    # Detrend the daily returns by subtracting off the mean daily return
+    detrended_returns = dailyreturns.apply(lambda x: x-meanDailyReturn)
+
+    return detrended_returns
+
+
+def GetPVal(sample_dist, rule_percent_return):
+    '''
+
+    :param sample_dist: sample distribution, this is assumed to be a distribution around zero
+    :param rule_percent_return: percent return of the trading rule
+    :return: return the pvalue associated with the trading rule
+    '''
+
+    lessThanCnt = 0
+    for meanReturn in sample_dist:
+        if meanReturn < rule_percent_return:
+            lessThanCnt += 1
+
+    percentage = lessThanCnt/float(len(sample_dist))
+    pval = 1-percentage
+
+    return pval

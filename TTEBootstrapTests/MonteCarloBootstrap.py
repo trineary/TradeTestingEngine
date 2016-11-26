@@ -95,7 +95,6 @@ class MonteCarloBootstrap(BootstrapABC):
 
         # Detrend the data
         detrended_returns = GetDetrendedReturns(self._df, self._col_name)
-        print detrended_returns
 
         # Run through iterations and collect distribution
         self._sample_means = []

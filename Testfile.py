@@ -118,24 +118,18 @@ def TestMonteCarloBootstrap():
     endDate = '2016-09-16'
     th = TradeHistory.TradeTracking(trackDailyPositions=True)
 
-
     df = testGetStockData(equity, startDate, endDate)
     th.InitTickData(df)
-    #print df.ix[2]['Date']
-    th.OpenTrade('SPY', df.ix[2]['Close'], 0.0, 1, df.ix[2]['Date'])
-    th.CloseTrade(df.ix[7]['Close'], df.ix[7]['Date'])
+    th.OpenTrade('SPY', df.ix[4]['Close'], 0.0, 1, df.ix[4]['Date'])
+    th.CloseTrade(df.ix[11]['Close'], df.ix[11]['Date'])
 
-    dataList = df['Close'].tolist()
+    rules = df['Position'].tolist()
 
-    #rules = [1] * len(dataList)
-
-    #mcbs = MonteCarloBootstrap.MonteCarloBootstrap()
-    #mcbs.init_test(df, 'Adj_Close', num_iterations=5000)
-    #mcbs.plot_histogram()
-    #pval = mcbs.has_predictive_power(rules)
-    #print "pval:", pval
-    pyplot.plot(df['Close'])
-    pyplot.show()
+    mcbs = MonteCarloBootstrap.MonteCarloBootstrap()
+    mcbs.init_test(df, 'Close', num_iterations=5000)
+    pval = mcbs.has_predictive_power(rules, rule_percent_return=0.00095)
+    mcbs.plot_histogram()
+    print "pval:", pval
 
     pass
 

@@ -85,6 +85,7 @@ def GetPVal(sample_dist, rule_percent_return):
             lessThanCnt += 1
 
     percentage = lessThanCnt/float(len(sample_dist))
+    #print percentage, lessThanCnt
     pval = 1-percentage
 
     return pval

@@ -73,7 +73,7 @@ class MonteCarloBootstrap(BootstrapABC):
             return -1
 
         # Get a copy of the detrended data
-        detrended_copy = list(detrended_data)
+        detrended_copy = detrended_data[0].tolist()
 
         # Cycle through the data now
         total_val = 0
@@ -82,6 +82,7 @@ class MonteCarloBootstrap(BootstrapABC):
             total_val += daily_direction * detrended_copy.pop(index)
 
         total_val /= len(detrended_data)*1.0
+        #print total_val
 
         return total_val
 
@@ -94,6 +95,7 @@ class MonteCarloBootstrap(BootstrapABC):
 
         # Detrend the data
         detrended_returns = GetDetrendedReturns(self._df, self._col_name)
+        print detrended_returns
 
         # Run through iterations and collect distribution
         self._sample_means = []

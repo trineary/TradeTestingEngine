@@ -17,7 +17,6 @@
 
 # Import my classes
 
-from tradelogger import TradeLogger
 from TSData.TSData import TSData, ReturnsDataSource, TSDataSource
 from TSDataInit import TSDataInit
 

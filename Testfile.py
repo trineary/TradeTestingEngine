@@ -83,14 +83,47 @@ def testGetStockData(equity, startDate, endDate):
     # Return the dataframe
     return df
 
-
+import numpy as np
+import pandas as pd
+import scipy.stats as stats
+import statsmodels.api as sm
+from sklearn.linear_model import LinearRegression
 def test1():
-    data = [1, 2, 3, 2.5, 3.5, 4, 3.25, 4.5, 5]
+    data = [4, 5, 6, 5.5, 8.5, 7, 4.25, 7.5, 8]
 
     dailyreturn = CalculateDailyReturn(data)
     #print dailyreturn
-    pyplot.plot(data)
-    pyplot.show()
+    x = range(0, len(data))
+    selection = 0
+    if selection == 0:
+        x = sm.add_constant(x, prepend=False)
+        model = sm.OLS(data, x)
+        results = model.fit()
+        print results.summary()
+        print "\nparams:", results.params # this is apparently the beta
+        print "predict: ", results.predict()
+        print "R^2:", results.rsquared
+        #http://statsmodels.sourceforge.net/devel/generated/statsmodels.regression.linear_model.RegressionResults.html
+        print "residuals: ", results.resid
+        print "fitted:", results.fittedvalues
+        pyplot.plot(data)
+        pyplot.plot(results.predict())
+        pyplot.show()
+    else:
+        lm = LinearRegression()
+        print x, data
+        print "lengths:", len(x), len(data)
+        lm.fit(pd.DataFrame(x), pd.DataFrame(data))
+        print "intercept: ", lm.intercept_
+        print "coeff: ", lm.coef_
+        #print lm.predict(data)
+        print "data", data
+        print "predict: ", lm.predict(pd.DataFrame(data))
+        print "lens: ", len(pd.DataFrame(x)), len(lm.predict(pd.DataFrame(data))), len(data)
+        pyplot.scatter(pd.DataFrame(x), lm.predict(pd.DataFrame(data)) - pd.DataFrame(data))
+        pyplot.show()
+
+    #pyplot.show()
     return
 
 def TestWhiteRealityCheck():
@@ -138,6 +171,6 @@ if __name__ == "__main__":
     print "Run default function for ", __file__
 
     #TestWhiteRealityCheck()
-    TestMonteCarloBootstrap()
-    #test1()
+    #TestMonteCarloBootstrap()
+    test1()
 

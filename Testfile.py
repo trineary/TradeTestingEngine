@@ -99,7 +99,8 @@ def test1():
     print "\nparams:", results.params # this is apparently the beta
     print "predict: ", results.predict()
     print "R^2:", results.rsquared
-    #http://statsmodels.sourceforge.net/devel/generated/statsmodels.regression.linear_model.RegressionResults.html
+    # http://statsmodels.sourceforge.net/devel/generated/statsmodels.regression.linear_model.RegressionResults.html
+    # http://statsmodels.sourceforge.net/devel/examples/generated/example_ols.html
     print "residuals: ", results.resid
     print "fitted:", results.fittedvalues
     pyplot.plot(data)

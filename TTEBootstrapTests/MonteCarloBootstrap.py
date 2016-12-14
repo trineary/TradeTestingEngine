@@ -52,7 +52,6 @@ class MonteCarloBootstrap(BootstrapABC):
         #gain = float(self._df.at[datalen-1, col_name]) - float(self._df.at[0, col_name])
         #dailyGain = gain/datalen
 
-
         pass
 
 

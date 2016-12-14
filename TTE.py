@@ -162,7 +162,13 @@ class TTE:
     def get_pvalue(self, iterations=5000):
 
         # Calculate the total return based on what has been tracked in the trade tracker
-        rule_percent_return = math.log10(self._tt.GetTotalPL()) / len(self._df[self._column])*1.0
+        totalPL = self._tt.GetTotalPL()
+        print "totalPL: ", totalPL
+        if totalPL > 0:
+            rule_percent_return = math.log10(totalPL)
+        else:
+            rule_percent_return = -math.log10(-1*totalPL)
+
         print "total PL: ", rule_percent_return
         # Initialize the test
         self._bs.init_test(self._df, self._column, num_iterations=iterations)
@@ -177,6 +183,10 @@ class TTE:
 
     def print_trade_stats(self):
 
+        self._tt.PrintHistory()
+        pass
+
+    def prtin_trade_history(self):
         self._tt.PrintHistory()
         pass
 

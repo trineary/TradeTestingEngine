@@ -16,7 +16,7 @@ class TradeDetails:
 
     CASH = 0
     LONG = 1
-    SHORT = 2
+    SHORT = -1
 
     def __init__(self):
         self.openPrice = 0.0
@@ -83,7 +83,7 @@ class TradeDetails:
         if self.tradeDirection is self.CASH:
             self.currPL = 0.0
         elif self.tradeDirection is self.SHORT:
-            self.currPL = self.openPrice - currprice - self.spread
+            self.currPL = float(self.openPrice) - float(currprice) - float(self.spread)
         else:
             self.currPL = float(currprice) - float(self.openPrice) - float(self.spread)
 

@@ -13,16 +13,14 @@
 # --------------------------------------------------------------------------------------------------------------------
 
 # Import standard packages
-
+import math
+import pandas as pd
+from matplotlib import pyplot
+import yahoo_finance as yfinance
 
 # Import my classes
 from TradeTracking.TradeHistory import TradeTracking
 from pytte.TTEBootstrapTests import WhiteBootstrap, MonteCarloBootstrap, TTEBootstrap
-#from TSData.TSData import *
-from matplotlib import pyplot
-import yahoo_finance as yfinance
-import pandas as pd
-#from TSDataInit import TSDataInit
 
 
 class TTE:
@@ -164,7 +162,7 @@ class TTE:
     def get_pvalue(self, iterations=5000):
 
         # Calculate the total return based on what has been tracked in the trade tracker
-        rule_percent_return = self._tt.GetTotalPL()
+        rule_percent_return = math.log10(self._tt.GetTotalPL()) / len(self._df[self._column])*1.0
         print "total PL: ", rule_percent_return
         # Initialize the test
         self._bs.init_test(self._df, self._column, num_iterations=iterations)

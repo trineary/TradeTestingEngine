@@ -31,6 +31,10 @@ class WhiteBootstrap(BootstrapABC):
 
     def __init__(self):
         self._sample_means = []
+        self._df = None
+        self._detrended_data = None
+        self._col_name = None
+        self._num_iterations = None
         pass
 
 
@@ -49,8 +53,6 @@ class WhiteBootstrap(BootstrapABC):
         self._num_iterations = num_iterations
 
         datalen = len(self._df.index)
-        #gain = float(self._df.at[datalen-1, col_name]) - float(self._df.at[0, col_name])
-        #dailyGain = gain/datalen
 
         # Detrend the data
         meanDailyReturn, dailyreturns = GetMeanDailyReturn(self._df, self._col_name)

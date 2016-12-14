@@ -30,7 +30,7 @@ class MonteCarloBootstrap(BootstrapABC):
 
     def __init__(self):
         self._sample_means = []
-        self._daily_rules = []
+        self._rules = []
         pass
 
     def init_test(self, df, col_name, num_iterations=5000):
@@ -67,7 +67,7 @@ class MonteCarloBootstrap(BootstrapABC):
         # and return that value.
 
         # check length of detrended data and daily rules.  They should be the same length.
-        if len(detrended_data) != len(self._daily_rules):
+        if len(detrended_data) != len(self._rules):
             print "Monte Carlo error! Detrended data and daily rules not the same length."
             return -1
 
@@ -76,7 +76,7 @@ class MonteCarloBootstrap(BootstrapABC):
 
         # Cycle through the data now
         total_val = 0
-        for daily_direction in self._daily_rules:
+        for daily_direction in self._rules:
             index = random.randint(0, len(detrended_copy)-1)
             total_val += daily_direction * detrended_copy.pop(index)
 
@@ -85,10 +85,13 @@ class MonteCarloBootstrap(BootstrapABC):
 
         return total_val
 
-    def has_predictive_power(self, daily_rules, rule_percent_return):
+    def has_predictive_power(self, rule_percent_return):
+
+        # Get daily rules from the dataframe
+        rules = self._df['Position'].tolist()
 
         # Set daily rules
-        self._daily_rules = daily_rules
+        self._rules = rules
 
         # Get one-day market price changes
 
@@ -112,7 +115,7 @@ def test_monte_carlo_round():
     data = [2, 3, 4, 3, 2]
 
     mc = MonteCarloBootstrap()
-    mc._daily_rules = rules
+    mc._rules = rules
 
     mean = mc.run_monte_carlo_round(data)
     print "mean result: ", mean
@@ -124,7 +127,7 @@ def test_monte_carlo_prediction():
     data = [2, 3, 4, 3, 2]
 
     mc = MonteCarloBootstrap()
-    mc._daily_rules = rules
+    mc._rules = rules
 
     mean = mc.run_monte_carlo_round(data)
     print "mean result: ", mean

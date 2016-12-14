@@ -10,7 +10,7 @@
 # --------------------------------------------------------------------------------------------------------------------
 
 import datetime
-
+import math
 
 class TradeDetails:
 
@@ -90,6 +90,17 @@ class TradeDetails:
         #print "GetCurrentPL: ", self.currPL, self.tradeDirection, self.spread
 
         return self.currPL
+
+    def GetTradePercentPL(self):
+
+        if self.tradeDirection is self.CASH:
+            totalPercentReturn = 0.0
+        elif self.tradeDirection is self.SHORT:
+            totalPercentReturn = math.log10(float(self.openPrice)) - math.log10(float(self.closePrice))
+        else:
+            totalPercentReturn = math.log10(float(self.closePrice)) - math.log10(float(self.openPrice))
+
+        return totalPercentReturn
 
     def GetTradeDuration(self):
         duration = self.closeTimeStamp - self.openTimeStamp

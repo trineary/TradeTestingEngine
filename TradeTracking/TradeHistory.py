@@ -9,6 +9,7 @@
 # This file
 # --------------------------------------------------------------------------------------------------------------------
 
+import math
 import datetime
 import numpy as np
 from TradeDetails import TradeDetails
@@ -18,6 +19,7 @@ class TradeTracking:
 
     def __init__(self, trackHistory=True, trackDailyPositions=False):
         self.totalPL = 0.0
+        self.totalPercentReturn = 0.0
         self.tradeHistory = []
         self.currTrade = TradeDetails()
         self.trackHistory = trackHistory
@@ -38,6 +40,7 @@ class TradeTracking:
         self.SHORT = -1
         self.firsttimestamp = None
         self.lasttimestamp = None
+        self.openPrice = 0.0
         self.cnt = 0
         return
 
@@ -85,6 +88,7 @@ class TradeTracking:
         self.ID = id
         self.isTradeOpen = True
         self.currTradeDirection = direction
+        self.openPrice = openprice
         #print "OpenTrade", equity, openprice, spread, direction, timestamp, id
         return
 
@@ -109,6 +113,7 @@ class TradeTracking:
         # Close the trade
         self.currTrade.CloseTrade(closeprice, timestamp)
         tradePL = self.currTrade.GetCurrentPL(closeprice)
+        self.totalPercentReturn += self.currTrade.GetTradePercentPL()
 
         if tradePL > 0 or self.cnt == 0:
             # add trade to the history if enabled
@@ -156,6 +161,10 @@ class TradeTracking:
         # This returns the cumulative PL prior to current trade (if any)
         return self.totalPL
 
+    def GetPercentReturn(self):
+        # This calculates the percent return using ln(r1) - ln(r2) where r1 and r2 are opening/closing prices
+        return self.totalPercentReturn
+
     def GetTradeStatsStr(self):
 
         tradestatsstr = ""
@@ -183,20 +192,6 @@ class TradeTracking:
             tradehistorystr += trade.__str__()
             print trade
 
-        totalTrades = max((self.totalWins + self.totalLosses), 1)
-        print "Trading Stats:"
-        print "Total trades:\t", totalTrades
-        print "Total Wins:\t\t", self.totalWins, ", %0.2f%%" % ((float(self.totalWins)/totalTrades)*100)
-        print "Total Losses:\t", self.totalLosses, ", %0.2f%%" % ((float(self.totalLosses)/totalTrades)*100)
-        longTrades = max((self.longWins + self.longLosses), 1)
-        shortTrades = max((self.shortWins + self.shortLosses), 1)
-        print "Long wins:\t\t", self.longWins, ", %0.2f%%" % ((float(self.longWins)/longTrades)*100)
-        print "Long losses:\t", self.longLosses, ", %0.2f%%" % ((float(self.longLosses)/longTrades)*100)
-        print "Short wins:\t\t", self.shortWins, ", %0.2f%%" % ((float(self.shortWins)/shortTrades)*100)
-        print "Short losses:\t", self.shortLosses, ", %0.2f%%" % ((float(self.shortLosses)/shortTrades)*100)
-        print "Total P/L:\t\t", self.totalPL
-        print "First timestamp:", self.firsttimestamp
-        print "Last timestamp:\t", self.lasttimestamp
         return tradehistorystr
 
     def GetHistory(self):

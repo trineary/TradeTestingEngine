@@ -35,10 +35,12 @@ def GetDailyReturns(df, colName):
     prev = None
     returns = []
     for index, rowVal in df[colName].iteritems():
+
         if(prev == None):
             dreturn = 0.0
         else:
             dreturn = math.log10(float(rowVal)/prev)
+            #print index, rowVal, dreturn
         prev = float(rowVal)
         returns.append(dreturn)
 

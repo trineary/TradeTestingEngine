@@ -39,13 +39,14 @@ def TestMonteCarloBootstrap(tte, df):
     print "pval:", pval
     tte.plot_pdf()
     print tte.get_trade_stats()
-    tte.plot_trades_equity()
+    #tte.plot_trades_equity()
+    tte.print_trade_history()
 
     pass
 
 
 def TestTTEBootstrap(tte, df):
-
+    print "TTE Bootstrap"
     tte.select_bootstrap(tte.BOOTSTRAP_TTE)
     pval = tte.get_pvalue(iterations=5000)
     print "pval:", pval, "\n"
@@ -81,20 +82,20 @@ if __name__ == "__main__":
     tte.close_trade(20)
 
     # Trade 4
-    tte.open_trade(20, tte.LONG)
-    tte.close_trade(25)
+    #tte.open_trade(20, tte.LONG)
+    #tte.close_trade(25)
 
     # Trade 5
-    tte.open_trade(30, tte.LONG)
-    tte.close_trade(35)
+    #tte.open_trade(30, tte.LONG)
+    #tte.close_trade(35)
 
     # Trade 6
-    tte.open_trade(40, tte.LONG)
-    tte.close_trade(45)
+    #tte.open_trade(40, tte.LONG)
+    #tte.close_trade(45)
 
     #TestWhiteRealityCheck(tte, df)
-    TestMonteCarloBootstrap(tte, df)
-    #TestTTEBootstrap(tte, df)
+    #TestMonteCarloBootstrap(tte, df)
+    TestTTEBootstrap(tte, df)
 
 
 

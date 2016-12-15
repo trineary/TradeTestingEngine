@@ -76,12 +76,16 @@ class MonteCarloBootstrap(BootstrapABC):
 
         # Cycle through the data now
         total_val = 0
-        for daily_direction in self._rules:
+        tradeDirection = 1
+        for index in xrange(0, len(detrended_copy)):
             index = random.randint(0, len(detrended_copy)-1)
-            total_val += daily_direction * detrended_copy.pop(index)
+            if tradeDirection == 1:
+                tradeDirection = -1
+            else:
+                tradeDirection = 1
+            total_val += tradeDirection * detrended_copy.pop(index)
 
-        total_val /= len(detrended_data)*1.0
-        #print total_val
+        #print "total_val: ", total_val
 
         return total_val
 
@@ -89,6 +93,7 @@ class MonteCarloBootstrap(BootstrapABC):
 
         # Get daily rules from the dataframe
         rules = self._df['Position'].tolist()
+        #print "rules", rules
 
         # Set daily rules
         self._rules = rules

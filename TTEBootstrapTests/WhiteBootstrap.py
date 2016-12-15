@@ -65,8 +65,9 @@ class WhiteBootstrap(BootstrapABC):
             for randomReturn in xrange(0, datalen):
                 index = random.randint(0, datalen-1)
                 sampleSum += dailyreturns.iat[index, 0]
-            sampleMean = sampleSum / datalen
-            meanList.append(sampleMean)
+            #sampleMean = sampleSum #/ datalen
+            #meanList.append(sampleMean)
+            meanList.append(sampleSum)
 
         #histogram, edges = np.histogram(meanList, bins=10)
 

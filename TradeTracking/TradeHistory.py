@@ -181,6 +181,7 @@ class TradeTracking:
         tradestatsstr += "Short wins:\t\t %d, \t%0.2f%%\n" %(self.shortWins, (float(self.shortWins)/shortTrades)*100)
         tradestatsstr += "Short losses:\t %d, \t%0.2f%%\n" %(self.shortLosses, (float(self.shortLosses)/shortTrades)*100)
         tradestatsstr += "Total P/L:\t\t %0.2f\n" % self.totalPL
+        tradestatsstr += "Percent P\L:\t %0.2f\n" % self.totalPercentReturn
         tradestatsstr += "First timestamp: %s\n" % self.firsttimestamp
         tradestatsstr += "Last timestamp:\t %s\n" % self.lasttimestamp
 

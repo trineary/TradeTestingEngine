@@ -49,10 +49,11 @@ def TestTTEBootstrap(tte, df):
     tte.select_bootstrap(tte.BOOTSTRAP_TTE)
     pval = tte.get_pvalue(iterations=5000)
     print "pval:", pval, "\n"
-    tte.plot_pdf()
-    tte.plot_trades_equity()
+    #tte.plot_pdf()
+    #tte.plot_trades_equity()
     tte.print_trade_history()
     tte.print_trade_stats()
+    tte.plot_all()
 
     pass
 
@@ -87,16 +88,16 @@ if __name__ == "__main__":
 
     # Trade 5
     #
-    # tte.open_trade(39, tte.LONG)
+    tte.open_trade(39, tte.LONG)
     tte.close_trade(46)
 
     # Trade 6
-    #tte.open_trade(47, tte.SHORT)
-    #tte.close_trade(50)
+    tte.open_trade(47, tte.LONG)
+    tte.close_trade(50)
 
     #TestWhiteRealityCheck(tte, df)
-    TestMonteCarloBootstrap(tte, df)
-    #TestTTEBootstrap(tte, df)
+    #TestMonteCarloBootstrap(tte, df)
+    TestTTEBootstrap(tte, df)
 
 
 

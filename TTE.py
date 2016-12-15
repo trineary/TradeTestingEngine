@@ -15,8 +15,10 @@
 # Import standard packages
 import math
 import pandas as pd
+import datetime as dt
 from matplotlib import pyplot
 import yahoo_finance as yfinance
+
 
 # Import my classes
 from TradeTracking.TradeHistory import TradeTracking
@@ -37,6 +39,7 @@ class TTE:
 
         # Trade tracking
         self._tt = TradeTracking(trackDailyPositions=True)
+        self._trade_history = None
         # Bootstrap initializations
         self._bs_tte = None
         self._bs_mc = None
@@ -46,6 +49,7 @@ class TTE:
         self._df = None
         self._column = None
         self._ticker = None
+
         return
 
     def get_hist_data(self, ticker, startdate, stopdate, column="Adj_Close"):
@@ -91,6 +95,7 @@ class TTE:
         self._df = hist_data
         self._tt.InitTickData(self._df)
         self._column = column
+        self._trade_history = [0]*len(self._df[self._column])  # Make trade history the same length as the data
 
         pass
 
@@ -101,6 +106,7 @@ class TTE:
         '''
         print "TODO: reset still needs to be implemented"
         pass
+
 
     def open_trade(self, index, direction):
         '''
@@ -221,6 +227,28 @@ class TTE:
         pyplot.show()
         pass
 
+    def plot_all(self):
+
+        pyplot.figure(1)
+        pyplot.subplot(311)
+        sample_means = self._bs.get_histogram_data()
+        pyplot.hist(sample_means, bins=20)
+        pyplot.grid(True)
+
+        pyplot.subplot(312)
+        pyplot.plot(self._df[self._column])
+
+        pyplot.subplot(313)
+        dates = self._df['Date'].tolist()
+        x = [dt.datetime.strptime(d,'%Y-%m-%d').date() for d in dates]
+        pyplot.plot(self._df['Position'])
+        #pyplot.plot(x, self._df['Position'])
+        #pyplot.gcf().autofmt_xdate()
+        pyplot.xticks( rotation= 45 )
+        x1,x2,y1,y2 = pyplot.axis()
+        pyplot.axis((x1,x2,(y1-0.25), (y2+0.25)))
+        pyplot.show()
+        pass
 
 # --------------------------------------------------------------------------------------------------------------------
 # Test functions

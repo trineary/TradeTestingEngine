@@ -62,6 +62,9 @@ class MonteCarloBootstrap(BootstrapABC):
             plt.show()
         return
 
+    def get_histogram_data(self):
+        return self._sample_means
+
     def run_monte_carlo_round(self, detrended_data):
         # Run through one iteration of pairing daily rules with detrended returns.  Calculate the average return
         # and return that value.

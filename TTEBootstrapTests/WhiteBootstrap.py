@@ -82,6 +82,9 @@ class WhiteBootstrap(BootstrapABC):
             plt.show()
         return
 
+    def get_histogram_data(self):
+        return self._sample_means
+
     def has_predictive_power(self, rule_percent_return):
 
         return GetPVal(self._sample_means, rule_percent_return)

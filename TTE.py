@@ -227,10 +227,15 @@ class TTE:
         pyplot.show()
         pass
 
-    def plot_all(self):
+    def plot_all(self, title=None):
+
+        #pyplot.xlabel('Smarts')
+        #pyplot.ylabel('Probability')
 
         pyplot.figure(1)
+
         pyplot.subplot(311)
+        pyplot.title(title)
         sample_means = self._bs.get_histogram_data()
         pyplot.hist(sample_means, bins=20)
         pyplot.grid(True)
@@ -247,6 +252,7 @@ class TTE:
         pyplot.xticks( rotation= 45 )
         x1,x2,y1,y2 = pyplot.axis()
         pyplot.axis((x1,x2,(y1-0.25), (y2+0.25)))
+
         pyplot.show()
         pass
 

@@ -20,40 +20,36 @@
 from pytte.tte import TTE
 
 
-def TestWhiteRealityCheck(tte, df):
-    print "White Bootstrap"
-    tte.select_bootstrap(tte.BOOTSTRAP_WHITE)
-    pval = tte.get_pvalue(iterations=5000)
-    print "pval:", pval
-    tte.plot_pdf()
-    print tte.get_trade_stats()
-    tte.plot_trades_equity()
+def PrintResults(tte, title=None):
 
-    pass
-
-
-def TestMonteCarloBootstrap(tte, df):
-    print "Monte Carlo Bootstrap"
-    tte.select_bootstrap(tte.BOOTSTRAP_MONTE_CARLO)
-    pval = tte.get_pvalue(iterations=5000)
-    print "pval:", pval
-    tte.plot_pdf()
-    print tte.get_trade_stats()
-    tte.plot_trades_equity()
-
-    pass
-
-
-def TestTTEBootstrap(tte, df):
-    print "TTE Bootstrap"
-    tte.select_bootstrap(tte.BOOTSTRAP_TTE)
     pval = tte.get_pvalue(iterations=5000)
     print "pval:", pval, "\n"
-    #tte.plot_pdf()
-    #tte.plot_trades_equity()
     tte.print_trade_history()
     tte.print_trade_stats()
-    tte.plot_all()
+    tte.plot_all(title)
+
+    pass
+
+def TestWhiteRealityCheck(tte):
+    print "White Bootstrap"
+    tte.select_bootstrap(tte.BOOTSTRAP_WHITE)
+    PrintResults(tte, "White Bootstrap")
+
+    pass
+
+
+def TestMonteCarloBootstrap(tte):
+    print "Monte Carlo Bootstrap"
+    tte.select_bootstrap(tte.BOOTSTRAP_MONTE_CARLO)
+    PrintResults(tte, "Monte Carlo Bootstrap")
+
+    pass
+
+
+def TestTTEBootstrap(tte):
+    print "TTE Bootstrap"
+    tte.select_bootstrap(tte.BOOTSTRAP_TTE)
+    PrintResults(tte, "TTE Bootstrap")
 
     pass
 
@@ -95,9 +91,9 @@ if __name__ == "__main__":
     tte.open_trade(47, tte.LONG)
     tte.close_trade(50)
 
-    #TestWhiteRealityCheck(tte, df)
-    #TestMonteCarloBootstrap(tte, df)
-    TestTTEBootstrap(tte, df)
+    #TestWhiteRealityCheck(tte)
+    #TestMonteCarloBootstrap(tte)
+    TestTTEBootstrap(tte)
 
 
 
